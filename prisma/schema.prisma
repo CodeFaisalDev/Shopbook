@@ -1,0 +1,162 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  String   @id @default(cuid())
+  firstName           String   @default("")
+  lastName            String   @default("")
+  username            String?  @unique
+  emailAddresses      String[] // Array of emails
+  primaryEmailAddress String?   @unique
+  phoneNumbers        String[] // Array of phone numbers
+  primaryPhoneNumber  String?  @unique
+  imageUrl            String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt @default(now())
+
+  // Relationships
+  posts     Post[]     // Posts made by the user
+  stories   Story[]    // Stories made by the user
+  reels     Reel[]     // Reels made by the user
+  followers Follower[] @relation("Followers")  // Followers of the user
+  following Follower[] @relation("Following")  // Users the user is following
+  wishlist  Wishlist[] // Wishlist items for the user
+  cart      CartItem[] // Cart items for the user
+  orders    Order[]    // Orders made by the user
+  reviews   Review[]   // Reviews written by the user
+  
+  comments  Comment[]  // New relation for comments made by the user
+  likes     Like[]     // New relation for likes made by the user
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  content   String
+  imageUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+
+  comments Comment[] // Comments on the post
+  likes    Like[]    // Likes on the post
+}
+
+model Story {
+  id        String   @id @default(cuid())
+  imageUrl  String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+}
+
+model Reel {
+  id        String   @id @default(cuid())
+  videoUrl  String
+  caption   String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    String
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    String
+}
+
+model Follower {
+  id        String  @id @default(cuid())
+  follower  User    @relation("Followers", fields: [followerId], references: [id])
+  followerId String
+  following User    @relation("Following", fields: [followingId], references: [id])
+  followingId String
+  createdAt DateTime @default(now())
+}
+
+model Wishlist {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String
+  quantity  Int      @default(1)
+}
+
+model Order {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  products  OrderProduct[]
+  totalPrice Float
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+}
+
+model OrderProduct {
+  id        String   @id @default(cuid())
+  order     Order    @relation(fields: [orderId], references: [id])
+  orderId   String
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String
+  quantity  Int      @default(1)
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String
+  rating    Int      @default(5)
+  comment   String?
+  createdAt DateTime @default(now())
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  price       Float
+  imageUrl    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  reviews     Review[]
+  
+  wishlist    Wishlist[]    // New relation for Wishlist items related to the product
+  cartItems   CartItem[]    // New relation for CartItems related to the product
+  orderItems  OrderProduct[] // New relation for OrderProduct items related to the product
+}
