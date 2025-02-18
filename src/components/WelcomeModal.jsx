@@ -77,7 +77,7 @@ const WelcomeModal = () => {
                     {!isLoaded ? (
                       <Skeleton className="w-64 h-4" />
                     ) : (
-                      <p>"Big Savings Alert! Shop now & enjoy exclusive deals on your favorite products! 🛍️"</p>
+                      <p>&quot;Big Savings Alert! Shop now &amp; enjoy exclusive deals on your favorite products! 🛍️&quot;</p>
                     )}
                   </div>
 

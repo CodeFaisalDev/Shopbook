@@ -1,4 +1,4 @@
-import HelloCard from '@/components/HelloCard/HelloCard'
+import HelloCard from '@/components/HelloCard' 
 import React from 'react'
 
 const page = () => {

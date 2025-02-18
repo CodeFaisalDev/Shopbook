@@ -7,14 +7,12 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel";
 import Image from "next/image";
-import { Button } from "../ui/button";
+import { Button } from "./ui/button"; 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useSpring, animated } from "@react-spring/web";
+import { useSpring } from "@react-spring/web";
 
 const carouselData = [
   {
