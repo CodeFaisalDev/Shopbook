@@ -3,11 +3,8 @@ import "./globals.css";
 
 import {
   ClerkProvider,
-  SignInButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
 } from "@clerk/nextjs";
+import { AuthProvider } from "@/context/AuthContext";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",

@@ -1,18 +1,22 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link"; // Import Next.js Link component
 import { UserButton } from "@clerk/nextjs";
 import { Button } from "./ui/button";
-
+import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { TicketPercent, ListMinus, Settings } from "lucide-react";
 // import { auth, User, currentUser } from "@clerk/nextjs/server";
 
 import { useUser } from "@clerk/nextjs";
+import Image from "next/image";
+import getUser from "@/utils/userServices";
 
 const Navbar = () => {
   // const { userId, sessionId } = await auth();
   const { user } = useUser();
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (user) {
@@ -41,14 +45,41 @@ const Navbar = () => {
     }
   }, [user]);
 
+  useEffect(() => {
+    if (user) {
+      fetch(`/api/auth?id=${user.id}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            setUserData(data.user);
+          } else {
+            console.error("Error fetching user data:", data.error);
+          }
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error("Error fetching user data:", err);
+          setLoading(false);
+        });
+    }
+  }, [user]);
+
   if (!user) return null;
+
+  // getUser()
 
   return (
     <div className="flex justify-between my-4">
       {/* User and activity button */}
       <div className="flex justify-center items-center gap-3">
         <div>
-          <UserButton
+          <Avatar>
+            <AvatarImage
+              src={userData?.imageUrl}
+              className="rounded-full bg-secondary p-1"
+            />
+          </Avatar>
+          {/* <UserButton
             userProfileMode="navigation"
             appearance={{
               elements: {
@@ -57,7 +88,7 @@ const Navbar = () => {
                 userButtonPopoverCard: "bg-gray-800",
               },
             }}
-          />
+          /> */}
         </div>
         <div>
           <Link href={`/${user.id}/myactivity`}>
